@@ -88,6 +88,8 @@ int motAngleLeft;
 int motAngleRight;
 int MotorPosL;
 int MotorPosR;
+int MotorCountL;
+int MotorCountR;
 
 #if defined(SIDEBOARD_SERIAL_USART2)
 extern SerialSideboard Sideboard_L;
@@ -572,17 +574,18 @@ int main(void)
 #endif
     }
 #endif
-// ####### FEEDBACK SERIAL OUT #######
+    // ####### FEEDBACK SERIAL OUT #######
+
 #if defined(FEEDBACK_SERIAL_USART2) || defined(FEEDBACK_SERIAL_USART3)
-    
+
     if (main_loop_counter % 2 == 0)
     { // Send data periodically every 10 ms
       motAngleLeft = rtY_Left.a_elecAngle;
       motAngleRight = rtY_Right.a_elecAngle;
-      Motor_Pos();
+
       Feedback.start = (uint16_t)SERIAL_START_FRAME;
-      Feedback.cmd1 = (int16_t)MotorPosL*2/30;             //(int16_t)input1[inIdx].cmd;
-      Feedback.cmd2 = (int16_t)rtY_Right.a_elecAngle; //(int16_t)input2[inIdx].cmd;
+      Feedback.cmd1 = (int16_t)input1[inIdx].cmd;
+      Feedback.cmd2 = (int16_t)input2[inIdx].cmd;
       Feedback.speedR_meas = (int16_t)rtY_Right.n_mot;
       Feedback.speedL_meas = (int16_t)rtY_Left.n_mot;
       Feedback.batVoltage = (int16_t)batVoltageCalib;
@@ -670,7 +673,7 @@ int main(void)
     inactivity_timeout_counter++;
 
     // ####### INACTIVITY TIMEOUT #######
-    if (abs(cmdL) > 50 || abs(cmdR) > 50)
+    if (abs(cmdL) > 5 || abs(cmdR) > 5)
     {
       inactivity_timeout_counter = 0;
     }
@@ -696,6 +699,7 @@ int main(void)
     inIdx_prev = inIdx;
     buzzerTimer_prev = buzzerTimer;
     main_loop_counter++;
+    Motor_Pos();
   }
 }
 }
@@ -771,8 +775,8 @@ void Motor_Pos()
   {
     cycleDegsL = cycleDegsL - 360;
   }
-  MotorPosL = motAngleLeft + cycleDegsL;
-
+  MotorPosL = (motAngleLeft + cycleDegsL) * 2 / 30;
+  MotorCountL = MotorPosL / 360;
   diffR = motAngleRight - motAngleRightLast;
   if (diffR < -180)
   {
@@ -782,7 +786,8 @@ void Motor_Pos()
   {
     cycleDegsR = cycleDegsR - 360;
   }
-  MotorPosR = motAngleRight + cycleDegsR;
+  MotorPosR = (motAngleRight + cycleDegsR) * 2 / 30;
+  MotorCountR = MotorPosR / 360;
   motAngleLeftLast = motAngleLeft;
   motAngleRightLast = motAngleRight;
   cnt++;
