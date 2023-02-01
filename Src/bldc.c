@@ -56,6 +56,9 @@ int16_t curR_phaB = 0, curR_phaC = 0, curR_DC = 0;
 volatile int pwml = 0;
 volatile int pwmr = 0;
 
+extern int motAngleLeft ;
+extern int motAngleRight ;
+
 extern volatile adc_buf_t adc_buffer;
 
 uint8_t buzzerFreq          = 0;
@@ -199,7 +202,7 @@ void DMA1_Channel1_IRQHandler(void) {
   // errCodeLeft  = rtY_Left.z_errCode;
   // motSpeedLeft = rtY_Left.n_mot;
   // motAngleLeft = rtY_Left.a_elecAngle;
-
+   motAngleLeft =rtY_Left.a_elecAngle;
     /* Apply commands */
     LEFT_TIM->LEFT_TIM_U    = (uint16_t)CLAMP(ul + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
     LEFT_TIM->LEFT_TIM_V    = (uint16_t)CLAMP(vl + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
@@ -237,7 +240,7 @@ void DMA1_Channel1_IRQHandler(void) {
  // errCodeRight  = rtY_Right.z_errCode;
  // motSpeedRight = rtY_Right.n_mot;
  // motAngleRight = rtY_Right.a_elecAngle;
-
+     motAngleRight =rtY_Right.a_elecAngle;
     /* Apply commands */
     RIGHT_TIM->RIGHT_TIM_U  = (uint16_t)CLAMP(ur + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
     RIGHT_TIM->RIGHT_TIM_V  = (uint16_t)CLAMP(vr + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
