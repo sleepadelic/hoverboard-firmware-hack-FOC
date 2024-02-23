@@ -594,7 +594,7 @@ int main(void)
 #if defined(FEEDBACK_SERIAL_USART2)
       if (__HAL_DMA_GET_COUNTER(huart2.hdmatx) == 0)
       {
-        Feedback.cmdLed = (uint16_t)sideboard_leds_L;
+        Feedback.cmdLed = (uint16_t)dc_curr; // 1 - 0,1A со сдвигом на 8-10 ед 65534 65530 при отсутствии команд
         Feedback.checksum = (uint16_t)(Feedback.start ^ Feedback.cmd1 ^ Feedback.cmd2 ^ Feedback.speedR_meas ^ Feedback.speedL_meas ^ Feedback.batVoltage ^ Feedback.boardTemp ^ Feedback.cmdLed);
 
         HAL_UART_Transmit_DMA(&huart2, (uint8_t *)&Feedback, sizeof(Feedback));
@@ -603,7 +603,7 @@ int main(void)
 #if defined(FEEDBACK_SERIAL_USART3)
       if (__HAL_DMA_GET_COUNTER(huart3.hdmatx) == 0)
       {
-        Feedback.cmdLed = (uint16_t)sideboard_leds_R;
+        Feedback.cmdLed = (uint16_t)dc_curr;
         Feedback.checksum = (uint16_t)(Feedback.start ^ Feedback.cmd1 ^ Feedback.cmd2 ^ Feedback.speedR_meas ^ Feedback.speedL_meas ^ Feedback.batVoltage ^ Feedback.boardTemp ^ Feedback.cmdLed);
 
         HAL_UART_Transmit_DMA(&huart3, (uint8_t *)&Feedback, sizeof(Feedback));
